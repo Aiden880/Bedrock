@@ -59,6 +59,7 @@ public class Bedrock {
         game.getCommandManager().register(this, BedrockCommands.getCommand(), "br", "bedrock");
         game.getCommandManager().register(this, FlyCommand.getCommand(), "fly");
         game.getCommandManager().register(this, PerformanceCommand.getCommand(), "performance", "perf", "gc");
+        game.getCommandManager().register(this, TimeCommand.getCommand(), "time");
         game.getCommandManager().register(this, TeleportCommand.getCommand(), "tp", "teleport");
         game.getCommandManager().register(this, TeleportHereCommand.getCommand(), "tphere");
         game.getCommandManager().register(this, WeatherCommand.getCommand(), "weather");
