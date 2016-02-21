@@ -33,11 +33,14 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Plugin(id = "Bedrock", name = "Bedrock", version = "1.0")
 public class Bedrock {
@@ -61,6 +64,7 @@ public class Bedrock {
         parentDirectory = defaultConfig.getParentFile();
 
         // Commands
+        game.getCommandManager().register(this, AfkCommand.getCommand(), "afk");
         game.getCommandManager().register(this, BedrockCommands.getCommand(), "br", "bedrock");
         game.getCommandManager().register(this, FlyCommand.getCommand(), "fly");
         game.getCommandManager().register(this, MessageCommand.getCommand(), "message", "m");
@@ -74,6 +78,7 @@ public class Bedrock {
         // Event Listeners
         game.getEventManager().registerListeners(this, new DisconnectListener());
         game.getEventManager().registerListeners(this, new JoinListener());
+        game.getEventManager().registerListeners(this, new MoveListener());
 
         logger.info("Bedrock started.");
     }

@@ -21,25 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.bedrock.listeners;
+package com.helion3.bedrock.managers;
 
 import com.helion3.bedrock.Bedrock;
-import com.helion3.bedrock.managers.AfkManager;
-import com.helion3.bedrock.util.Format;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 
-public class JoinListener {
-    @Listener
-    public void onPlayerJoin(final ClientConnectionEvent.Join event) {
-        Player player = event.getTargetEntity();
-        Bedrock.getPlayerConfigManager().loadPlayer(player);
-        if(AfkManager.afkPlayers.contains(player)){
-            AfkManager.afkPlayers.remove(player);
-        }
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Created by Aiden on 21/02/2016.
+ */
+public class AfkManager {
+    private AfkManager() {}
+    public static void removeFromAfk(Player p) {
+        afkPlayers.remove(p);
+        MessageChannel.TO_ALL.send(Text.builder(p.getName() + " is no longer AFK.").build());
     }
-
+    public static List<Player> afkPlayers = new ArrayList<Player>();
 }

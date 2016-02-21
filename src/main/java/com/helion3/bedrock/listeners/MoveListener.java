@@ -24,22 +24,23 @@
 package com.helion3.bedrock.listeners;
 
 import com.helion3.bedrock.Bedrock;
+import com.helion3.bedrock.commands.AfkCommand;
 import com.helion3.bedrock.managers.AfkManager;
-import com.helion3.bedrock.util.Format;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.entity.DisplaceEntityEvent;
 
-public class JoinListener {
+/**
+ * Created by Aiden on 21/02/2016.
+ */
+public class MoveListener {
     @Listener
-    public void onPlayerJoin(final ClientConnectionEvent.Join event) {
-        Player player = event.getTargetEntity();
-        Bedrock.getPlayerConfigManager().loadPlayer(player);
-        if(AfkManager.afkPlayers.contains(player)){
-            AfkManager.afkPlayers.remove(player);
+    public void onPlayerMove(DisplaceEntityEvent.Move event) {
+        if(event.getTargetEntity() instanceof Player) {
+            Player player = (Player) event.getTargetEntity();
+            if(AfkManager.afkPlayers.contains(player)) {
+                AfkManager.removeFromAfk(player);
+            }
         }
-
     }
-
 }
