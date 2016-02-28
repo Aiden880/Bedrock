@@ -23,45 +23,36 @@
  */
 package com.helion3.bedrock.commands;
 
+import com.helion3.bedrock.Bedrock;
 import com.helion3.bedrock.util.Format;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
-public class FeedCommand {
-    private FeedCommand() {}
+public class TeleportWorldCommand {
+    private TeleportWorldCommand() {}
 
     public static CommandSpec getCommand() {
         return CommandSpec.builder()
         .arguments(
-            GenericArguments.playerOrSource(Text.of("player"))
+            GenericArguments.world(Text.of("world"))
         )
-        .description(Text.of("Feed yourself or another player."))
+        .description(Text.of("Teleport to a world."))
+        .permission("bedrock.tpworld")
         .executor((source, args) -> {
-            Player player = args.<Player>getOne("player").get();
-            boolean forSelf = source.equals(player);
-
-            // Permissions
-            if (!forSelf && !source.hasPermission("bedrock.feed.others")) {
-                source.sendMessage(Format.error("You do not have permission to feed other players."));
-                return CommandResult.empty();
-            }
-            else if (forSelf && !source.hasPermission("bedrock.feed")) {
-                source.sendMessage(Format.error("Insufficient permissions."));
+            if (!(source instanceof Player)) {
+                source.sendMessage(Format.error("Only players may use this command."));
                 return CommandResult.empty();
             }
 
-            // Feed
-            player.offer(Keys.FOOD_LEVEL, 20);
+            WorldProperties properties = args.<WorldProperties>getOne("world").get();
+            World world = Bedrock.getGame().getServer().getWorld(properties.getUniqueId()).get();
 
-            // Message
-            player.sendMessage(Format.success("Fed you!"));
-            if (!forSelf) {
-                source.sendMessage(Format.success(String.format("Fed %s", player.getName())));
-            }
+            Bedrock.getTeleportManager().teleport((Player) source, world);
 
             return CommandResult.success();
         }).build();

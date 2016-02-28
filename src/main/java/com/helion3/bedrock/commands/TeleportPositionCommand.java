@@ -23,45 +23,34 @@
  */
 package com.helion3.bedrock.commands;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.helion3.bedrock.Bedrock;
 import com.helion3.bedrock.util.Format;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-public class FeedCommand {
-    private FeedCommand() {}
+public class TeleportPositionCommand {
+    private TeleportPositionCommand() {}
 
     public static CommandSpec getCommand() {
         return CommandSpec.builder()
         .arguments(
-            GenericArguments.playerOrSource(Text.of("player"))
+            GenericArguments.vector3d(Text.of("location"))
         )
-        .description(Text.of("Feed yourself or another player."))
+        .description(Text.of("Teleport to a location."))
+        .permission("bedrock.tppos")
         .executor((source, args) -> {
-            Player player = args.<Player>getOne("player").get();
-            boolean forSelf = source.equals(player);
-
-            // Permissions
-            if (!forSelf && !source.hasPermission("bedrock.feed.others")) {
-                source.sendMessage(Format.error("You do not have permission to feed other players."));
-                return CommandResult.empty();
-            }
-            else if (forSelf && !source.hasPermission("bedrock.feed")) {
-                source.sendMessage(Format.error("Insufficient permissions."));
+            if (!(source instanceof Player)) {
+                source.sendMessage(Format.error("Only players may use this command."));
                 return CommandResult.empty();
             }
 
-            // Feed
-            player.offer(Keys.FOOD_LEVEL, 20);
+            Vector3d position = args.<Vector3d>getOne("location").get();
 
-            // Message
-            player.sendMessage(Format.success("Fed you!"));
-            if (!forSelf) {
-                source.sendMessage(Format.success(String.format("Fed %s", player.getName())));
-            }
+            Bedrock.getTeleportManager().teleport((Player) source, position);
 
             return CommandResult.success();
         }).build();

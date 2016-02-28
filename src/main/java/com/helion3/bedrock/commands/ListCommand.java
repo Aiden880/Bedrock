@@ -23,47 +23,37 @@
  */
 package com.helion3.bedrock.commands;
 
+import com.helion3.bedrock.Bedrock;
 import com.helion3.bedrock.util.Format;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
-public class FeedCommand {
-    private FeedCommand() {}
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class ListCommand {
+    private ListCommand() {}
 
     public static CommandSpec getCommand() {
         return CommandSpec.builder()
-        .arguments(
-            GenericArguments.playerOrSource(Text.of("player"))
-        )
-        .description(Text.of("Feed yourself or another player."))
-        .executor((source, args) -> {
-            Player player = args.<Player>getOne("player").get();
-            boolean forSelf = source.equals(player);
+            .description(Text.of("List online players."))
+            .executor((source, args) -> {
+                Collection<Player> players = Bedrock.getGame().getServer().getOnlinePlayers();
 
-            // Permissions
-            if (!forSelf && !source.hasPermission("bedrock.feed.others")) {
-                source.sendMessage(Format.error("You do not have permission to feed other players."));
-                return CommandResult.empty();
-            }
-            else if (forSelf && !source.hasPermission("bedrock.feed")) {
-                source.sendMessage(Format.error("Insufficient permissions."));
-                return CommandResult.empty();
-            }
+                source.sendMessage(Format.heading("There are ",
+                    TextColors.AQUA, players.size(), TextColors.WHITE, " players online!"));
 
-            // Feed
-            player.offer(Keys.FOOD_LEVEL, 20);
+                ArrayList<String> names = new ArrayList<>();
+                for (Player player : players) {
+                    names.add(player.getName());
+                }
 
-            // Message
-            player.sendMessage(Format.success("Fed you!"));
-            if (!forSelf) {
-                source.sendMessage(Format.success(String.format("Fed %s", player.getName())));
-            }
+                source.sendMessage(Format.message(String.join(", ", names)));
 
-            return CommandResult.success();
-        }).build();
+                return CommandResult.success();
+            }).build();
     }
 }

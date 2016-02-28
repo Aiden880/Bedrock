@@ -21,39 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.bedrock.commands;
+package com.helion3.bedrock.listeners;
 
 import com.helion3.bedrock.Bedrock;
-import com.helion3.bedrock.managers.TeleportManager.Teleport;
-import com.helion3.bedrock.util.Format;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.action.FishingEvent;
+import org.spongepowered.api.event.filter.cause.First;
 
-public class TeleportRequestCommand {
-    private TeleportRequestCommand() {}
-
-    public static CommandSpec getCommand() {
-        return CommandSpec.builder()
-        .arguments(
-            GenericArguments.player(Text.of("player"))
-        )
-        .description(Text.of("Request teleport to another player."))
-        .permission("bedrock.tpa")
-        .executor((source, args) -> {
-            if (!(source instanceof Player)) {
-                source.sendMessage(Format.error("Only players may use this command."));
-                return CommandResult.empty();
-            }
-
-            // Request...
-            Teleport teleport = new Teleport((Player) source, args.<Player>getOne("player").get());
-            teleport.setRequestedBy((Player) source);
-            Bedrock.getTeleportManager().request(teleport);
-
-            return CommandResult.success();
-        }).build();
+public class FishingListener {
+    @Listener
+    public void onFishing(final FishingEvent.Start event, @First Player player) {
+        Bedrock.getAFKManager().lastActivity(player);
     }
 }
